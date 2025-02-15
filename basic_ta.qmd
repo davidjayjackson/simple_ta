@@ -1,0 +1,102 @@
+--- 
+title: "Basic Stock Analysis ET/VDADX"
+format: html
+jupyter: python3
+toc: true
+echo: false
+---
+```{python}
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+# import pandas_ta as ta
+import yfinance as yf
+
+# Fetch historical stock data from Yahoo Finance
+symbol = "ET"
+df = yf.download(symbol, start="2024-01-01",auto_adjust=False)
+data = df.xs('ET',axis=1,level='Ticker').reset_index()
+data['100_day_MA'] = data['Close'].rolling(window=100).mean()
+data['Date'] = pd.to_datetime(data['Date'])
+# Use query on the DataFrame
+df_filtered = df.query('Date >= "2014-05-01"')
+data = data.query('Date >="2014-05-01"')
+```
+## Plot of Energy Transfer (ET) Daily Close + 100 Day Movng Average
+
+```{python}
+sns.lineplot(x='Date',y='Close',data=data, label="Close Price")
+sns.lineplot(x='Date',y='100_day_MA',data=data,label="100_day_MA")
+plt.grid()
+plt.title("ET Daily Closing Price")
+```
+## Bellinger Bands(ET)
+
+```{python}
+# Calculate the moving average and standard deviation
+data['SMA'] = data['Close'].rolling(window=20).mean()  # 20-day SMA
+data['STD'] = data['Close'].rolling(window=20).std()   # 20-day standard deviation
+
+# Calculate the Bollinger Bands
+data['Upper Band'] = data['SMA'] + (data['STD'] * 2)
+data['Lower Band'] = data['SMA'] - (data['STD'] * 2)
+
+# Plot the data
+plt.figure(figsize=(12, 6))
+plt.plot(data['Close'], label='Close Price', color='blue')
+plt.plot(data['SMA'], label='20-Day SMA', color='orange')
+plt.plot(data['Upper Band'], label='Upper Bollinger Band', color='green')
+plt.plot(data['Lower Band'], label='Lower Bollinger Band', color='red')
+plt.fill_between(data.index, data['Upper Band'], data['Lower Band'], color='grey', alpha=0.3)
+plt.title(f'Bollinger Bands for {symbol}')
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.legend()
+plt.grid()
+plt.show()
+```
+## Vanguard Dividend Appreciation Index Fund
+```{python}
+# Fetch historical stock data from Yahoo Finance
+symbol = "VDADX"
+df = yf.download(symbol, start="2024-01-01",auto_adjust=False)
+data = df.xs('VDADX',axis=1,level='Ticker').reset_index()
+data['100_day_MA'] = data['Close'].rolling(window=100).mean()
+data['Date'] = pd.to_datetime(data['Date'])
+# Use query on the DataFrame
+df_filtered = df.query('Date >= "2014-05-01"')
+data = data.query('Date >="2014-05-01"')
+```
+
+```{python}
+sns.lineplot(x='Date',y='Close',data=data, label="Close Price")
+sns.lineplot(x='Date',y='100_day_MA',data=data,label="100_day_MA")
+plt.grid()
+plt.title("VDADX Daily Closing Price")
+```
+
+## Bellinger Bands: VDADX
+
+```{python}
+# Calculate the moving average and standard deviation
+data['SMA'] = data['Close'].rolling(window=20).mean()  # 20-day SMA
+data['STD'] = data['Close'].rolling(window=20).std()   # 20-day standard deviation
+
+# Calculate the Bollinger Bands
+data['Upper Band'] = data['SMA'] + (data['STD'] * 2)
+data['Lower Band'] = data['SMA'] - (data['STD'] * 2)
+
+# Plot the data
+plt.figure(figsize=(12, 6))
+plt.plot(data['Close'], label='Close Price', color='blue')
+plt.plot(data['SMA'], label='20-Day SMA', color='orange')
+plt.plot(data['Upper Band'], label='Upper Bollinger Band', color='green')
+plt.plot(data['Lower Band'], label='Lower Bollinger Band', color='red')
+plt.fill_between(data.index, data['Upper Band'], data['Lower Band'], color='grey', alpha=0.3)
+plt.title(f'Bollinger Bands for {symbol}')
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.legend()
+plt.grid()
+plt.show()
+```
